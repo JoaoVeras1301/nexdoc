@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexDoc Corporativo — Gestão de Documentos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-blue-100 selection:text-blue-900">
+
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden transition-opacity"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out border-r border-slate-800">
+      <div>
+        <!-- Brand -->
+        <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-white font-semibold tracking-tight text-base block leading-none">NexDoc</span>
+              <span class="text-[11px] text-slate-400 font-medium tracking-wider uppercase">Corporativo</span>
+            </div>
+          </div>
+          <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="p-4 space-y-6">
+          <div>
+            <p class="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Principal</p>
+            <nav class="space-y-1">
+              <button onclick="setView('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-slate-800/80 text-white transition-colors">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+                Visão Geral
+              </button>
+              <button onclick="setView('all')" id="nav-all" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="files" class="w-4 h-4"></i>
+                  Todos os Arquivos
+                </span>
+                <span id="count-all" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">0</span>
+              </button>
+            </nav>
+          </div>
+
+          <div>
+            <p class="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Pastas Setoriais</p>
+            <nav class="space-y-1">
+              <button onclick="setCategory('Financeiro')" id="nav-cat-Financeiro" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i>
+                  Financeiro
+                </span>
+                <span id="count-Financeiro" class="text-xs text-slate-500">0</span>
+              </button>
+              <button onclick="setCategory('Recursos Humanos')" id="nav-cat-Recursos Humanos" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i>
+                  Recursos Humanos
+                </span>
+                <span id="count-Recursos Humanos" class="text-xs text-slate-500">0</span>
+              </button>
+              <button onclick="setCategory('Contratos')" id="nav-cat-Contratos" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i>
+                  Contratos
+                </span>
+                <span id="count-Contratos" class="text-xs text-slate-500">0</span>
+              </button>
+              <button onclick="setCategory('Administrativo')" id="nav-cat-Administrativo" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i>
+                  Administrativo
+                </span>
+                <span id="count-Administrativo" class="text-xs text-slate-500">0</span>
+              </button>
+              <button onclick="setCategory('Outros documentos')" id="nav-cat-Outros documentos" class="nav-item w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i>
+                  Outros documentos
+                </span>
+                <span id="count-Outros documentos" class="text-xs text-slate-500">0</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="p-4 border-t border-slate-800">
+        <div class="bg-slate-800/60 rounded-lg p-3 border border-slate-700/60 flex items-center gap-2.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-blue-400 shrink-0"></i>
+          <div>
+            <p class="text-xs font-medium text-slate-200 leading-tight">Repositório Corporativo</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Ambiente organizado e ativo</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0">
+      
+      <!-- Top Header -->
+      <header class="h-16 bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <div class="flex items-center gap-2.5">
+            <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              Vértice Soluções Ltda.
+            </span>
+            <span class="text-slate-300 hidden sm:inline">/</span>
+            <h1 id="page-title" class="text-sm sm:text-base font-semibold text-slate-800">Visão Geral</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 sm:gap-5">
+          <!-- Quick Search in Header -->
+          <div class="hidden md:flex items-center relative w-64">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3"></i>
+            <input type="text" id="header-search" oninput="syncSearch(this.value)" placeholder="Buscar documento..." class="w-full pl-9 pr-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:border-blue-600 transition-colors">
+          </div>
+
+          <!-- Upload CTA -->
+          <button onclick="openUploadModal()" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3.5 py-2 rounded-lg shadow-sm transition-colors cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Adicionar Arquivo</span>
+          </button>
+
+          <!-- User Profile -->
+          <div class="flex items-center gap-2.5 pl-3 border-l border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">
+              CM
+            </div>
+            <div class="hidden sm:block text-left leading-tight">
+              <p class="text-xs font-semibold text-slate-800">Camila Mendes</p>
+              <p class="text-[11px] text-slate-500">Gestão Administrativa</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Workspace Body -->
+      <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard-section" class="space-y-6">
+          
+          <!-- KPI Cards (3 balanced columns without storage metric) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Documentos</p>
+                <p id="kpi-total-docs" class="text-2xl font-bold text-slate-900 mt-1.5">0</p>
+                <p class="text-xs text-slate-500 mt-1">Arquivos ativos no sistema</p>
+              </div>
+              <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Adicionados Recentemente</p>
+                <p id="kpi-recent-docs" class="text-2xl font-bold text-slate-900 mt-1.5">0</p>
+                <p class="text-xs text-emerald-600 font-medium mt-1">Últimos 7 dias</p>
+              </div>
+              <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Pastas Departamentais</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1.5">5</p>
+                <p class="text-xs text-slate-500 mt-1">Setores organizados</p>
+              </div>
+              <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                <i data-lucide="folder-tree" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Folder Access -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-semibold text-slate-800">Acesso Rápido por Categoria</h2>
+              <button onclick="setView('all')" class="text-xs font-medium text-blue-600 hover:text-blue-700">Ver todos os arquivos &rarr;</button>
+            </div>
+            <div id="folder-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Recent Files Table on Dashboard -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-800">Arquivos Adicionados Recentemente</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Últimas movimentações registradas pela equipe</p>
+              </div>
+              <button onclick="setView('all')" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
+                Gerenciar Todos
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="py-3 px-6">Nome do Arquivo</th>
+                    <th class="py-3 px-4">Categoria</th>
+                    <th class="py-3 px-4">Formato</th>
+                    <th class="py-3 px-4">Data de Envio</th>
+                    <th class="py-3 px-6 text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-files-tbody" class="divide-y divide-slate-100 text-sm">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- FILE MANAGER SECTION -->
+        <section id="files-section" class="hidden space-y-5">
+          
+          <!-- Filter & Search Bar -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+            <div class="relative flex-1 max-w-md">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="manager-search" oninput="syncSearch(this.value)" placeholder="Pesquisar por nome do arquivo ou responsável..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:border-blue-600 transition-colors">
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <select id="filter-category" onchange="applyFilters()" class="text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:border-blue-600">
+                <option value="all">Todas as Categorias</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Contratos">Contratos</option>
+                <option value="Administrativo">Administrativo</option>
+                <option value="Outros documentos">Outros documentos</option>
+              </select>
+
+              <select id="filter-type" onchange="applyFilters()" class="text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:border-blue-600">
+                <option value="all">Todos os Tipos</option>
+                <option value="PDF">Documento PDF (.pdf)</option>
+                <option value="XLSX">Planilha Excel (.xlsx)</option>
+                <option value="DOCX">Texto Word (.docx)</option>
+                <option value="IMG">Imagem / Digitalizado (.png/.jpg)</option>
+              </select>
+
+              <button onclick="resetFilters()" id="reset-filters-btn" class="hidden text-xs font-medium text-slate-500 hover:text-slate-800 px-2.5 py-2">
+                Limpar filtros
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Document Table -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="px-6 py-3.5 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
+              <span id="table-results-label" class="text-xs font-medium text-slate-600">Exibindo 0 documentos</span>
+              <span class="text-xs text-slate-400 hidden sm:inline">Ordenado por data mais recente</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="py-3.5 px-6">Documento</th>
+                    <th class="py-3.5 px-4">Categoria</th>
+                    <th class="py-3.5 px-4">Tipo</th>
+                    <th class="py-3.5 px-4">Data</th>
+                    <th class="py-3.5 px-4">Responsável</th>
+                    <th class="py-3.5 px-6 text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="all-files-tbody" class="divide-y divide-slate-100 text-sm">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden py-14 px-6 text-center">
+              <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="folder-search" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-sm font-semibold text-slate-800">Nenhum documento encontrado</h3>
+              <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Não encontramos arquivos correspondentes aos filtros ou termos pesquisados.</p>
+              <button onclick="resetFilters()" class="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 px-3.5 py-2 rounded-lg">
+                Restaurar visualização
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD FILE -->
+  <div id="upload-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-[1px] p-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-base font-semibold text-slate-900">Adicionar Novo Arquivo</h3>
+        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <form id="upload-form" onsubmit="handleAddFile(event)" class="p-6 space-y-4">
+        <!-- File Dropzone -->
+        <div class="border-2 border-dashed border-slate-200 hover:border-blue-500 rounded-xl p-5 text-center transition-colors bg-slate-50/60 cursor-pointer" onclick="document.getElementById('real-file-input').click()">
+          <input type="file" id="real-file-input" class="hidden" onchange="handleRealFileSelect(event)">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-2">
+            <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+          </div>
+          <p class="text-xs font-medium text-slate-700">Clique para selecionar um arquivo do computador</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">PDF, DOCX, XLSX, PNG ou JPG</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nome do Documento *</label>
+          <input type="text" id="input-doc-name" required placeholder="Ex: Balancete_Mensal_Outubro.pdf" class="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-600">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Categoria *</label>
+            <select id="input-doc-category" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-blue-600">
+              <option value="Financeiro">Financeiro</option>
+              <option value="Recursos Humanos">Recursos Humanos</option>
+              <option value="Contratos">Contratos</option>
+              <option value="Administrativo">Administrativo</option>
+              <option value="Outros documentos">Outros documentos</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Arquivo *</label>
+            <select id="input-doc-type" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-blue-600">
+              <option value="PDF">PDF</option>
+              <option value="XLSX">XLSX (Planilha)</option>
+              <option value="DOCX">DOCX (Texto)</option>
+              <option value="IMG">Imagem</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Observação / Descrição breve</label>
+          <input type="text" id="input-doc-desc" placeholder="Ex: Documento validado pela diretoria" class="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-600">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors">
+            Salvar Documento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PREVIEW DOCUMENT -->
+  <div id="preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-[1px] p-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div id="preview-icon-box" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+          </div>
+          <h3 id="preview-title" class="text-sm font-semibold text-slate-900 truncate max-w-xs sm:max-w-sm">Documento</h3>
+        </div>
+        <button onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-4">
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center space-y-2">
+          <i data-lucide="file-check-2" class="w-10 h-10 text-slate-400 mx-auto"></i>
+          <p class="text-sm font-medium text-slate-800" id="preview-filename-display">arquivo.pdf</p>
+          <p class="text-xs text-slate-500" id="preview-desc-display">Visualização rápida de metadados e conteúdo corporativo.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-lg border border-slate-100 bg-slate-50/50">
+            <span class="text-slate-400 block">Categoria</span>
+            <span id="preview-category" class="font-semibold text-slate-800 mt-0.5 block">-</span>
+          </div>
+          <div class="p-3 rounded-lg border border-slate-100 bg-slate-50/50">
+            <span class="text-slate-400 block">Formato</span>
+            <span id="preview-type" class="font-semibold text-slate-800 mt-0.5 block">-</span>
+          </div>
+          <div class="p-3 rounded-lg border border-slate-100 bg-slate-50/50">
+            <span class="text-slate-400 block">Data de Registro</span>
+            <span id="preview-date" class="font-semibold text-slate-800 mt-0.5 block">-</span>
+          </div>
+          <div class="p-3 rounded-lg border border-slate-100 bg-slate-50/50">
+            <span class="text-slate-400 block">Responsável</span>
+            <span id="preview-author" class="font-semibold text-slate-800 mt-0.5 block">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+        <button onclick="closePreviewModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-200/70 rounded-lg transition-colors">
+          Fechar
+        </button>
+        <button id="preview-download-btn" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          Baixar Arquivo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-lg shadow-lg flex items-center gap-2.5 border border-slate-700">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+      <span id="toast-message">Ação concluída com sucesso.</span>
+    </div>
+  </div>
+
+  <script>
+    // Initial Corporate Documents Dataset
+    const defaultDocuments = [
+      {
+        id: 'doc-1',
+        name: 'Demonstrativo_Financeiro_Q3_2025.xlsx',
+        category: 'Financeiro',
+        type: 'XLSX',
+        date: '2025-05-14',
+        isRecent: true,
+        author: 'Ricardo Alves',
+        description: 'Fechamento trimestral de receitas, despesas operacionais e fluxo de caixa.'
+      },
+      {
+        id: 'doc-2',
+        name: 'Contrato_Prestacao_Servicos_TI_2025.pdf',
+        category: 'Contratos',
+        type: 'PDF',
+        date: '2025-05-12',
+        isRecent: true,
+        author: 'Camila Mendes',
+        description: 'Contrato anual de infraestrutura e suporte técnico assinado digitalmente.'
+      },
+      {
+        id: 'doc-3',
+        name: 'Politica_Interna_Onboarding_Colaboradores.docx',
+        category: 'Recursos Humanos',
+        type: 'DOCX',
+        date: '2025-05-10',
+        isRecent: true,
+        author: 'Fernanda Costa',
+        description: 'Manual de integração, benefícios e normas internas para novas contratações.'
+      },
+      {
+        id: 'doc-4',
+        name: 'Alvara_Funcionamento_Sede_Atualizado.pdf',
+        category: 'Administrativo',
+        type: 'PDF',
+        date: '2025-04-28',
+        isRecent: false,
+        author: 'Camila Mendes',
+        description: 'Licença municipal vigente da unidade matriz.'
+      },
+      {
+        id: 'doc-5',
+        name: 'Folha_Pagamento_Consolidada_Abril.xlsx',
+        category: 'Recursos Humanos',
+        type: 'XLSX',
+        date: '2025-04-25',
+        isRecent: false,
+        author: 'Fernanda Costa',
+        description: 'Resumo de encargos, benefícios e proventos mensais.'
+      },
+      {
+        id: 'doc-6',
+        name: 'Nota_Fiscal_Equipamentos_Escritorio_0942.pdf',
+        category: 'Financeiro',
+        type: 'PDF',
+        date: '2025-04-19',
+        isRecent: false,
+        author: 'Ricardo Alves',
+        description: 'Aquisição de estações de trabalho e monitores corporativos.'
+      },
+      {
+        id: 'doc-7',
+        name: 'Acordo_Confidencialidade_NDA_Parceiros.docx',
+        category: 'Contratos',
+        type: 'DOCX',
+        date: '2025-04-11',
+        isRecent: false,
+        author: 'Camila Mendes',
+        description: 'Minuta padrão de sigilo empresarial para fornecedores externos.'
+      },
+      {
+        id: 'doc-8',
+        name: 'Planta_Baixa_Layout_Escritorio_2Andar.png',
+        category: 'Outros documentos',
+        type: 'IMG',
+        date: '2025-03-30',
+        isRecent: false,
+        author: 'Lucas Pereira',
+        description: 'Mapeamento de salas de reunião e estações administrativas.'
+      }
+    ];
+
+    const categories = [
+      'Financeiro',
+      'Recursos Humanos',
+      'Contratos',
+      'Administrativo',
+      'Outros documentos'
+    ];
+
+    // State
+    let documents = JSON.parse(localStorage.getItem('nexdoc_files')) || defaultDocuments;
+    let currentView = 'dashboard';
+    let searchQuery = '';
+    let selectedCategory = 'all';
+    let selectedType = 'all';
+
+    // Save to localStorage
+    function saveState() {
+      localStorage.setItem('nexdoc_files', JSON.stringify(documents));
+    }
+
+    // Format Date PT-BR
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Get Icon & Badge Style by File Type
+    function getTypeBadge(type) {
+      const styles = {
+        PDF: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', icon: 'file-text' },
+        XLSX: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', icon: 'file-spreadsheet' },
+        DOCX: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', icon: 'file-type-2' },
+        IMG: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', icon: 'image' }
+      };
+      return styles[type] || { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200', icon: 'file' };
+    }
+
+    // Update Sidebar Counters & Dashboard KPIs
+    function updateMetrics() {
+      const totalDocs = documents.length;
+      const recentDocs = documents.filter(d => d.isRecent).length;
+
+      document.getElementById('kpi-total-docs').textContent = totalDocs;
+      document.getElementById('kpi-recent-docs').textContent = recentDocs;
+      document.getElementById('count-all').textContent = totalDocs;
+
+      categories.forEach(cat => {
+        const count = documents.filter(d => d.category === cat).length;
+        const el = document.getElementById(`count-${cat}`);
+        if (el) el.textContent = count;
+      });
+    }
+
+    // Render Folder Cards on Dashboard
+    function renderFolderCards() {
+      const grid = document.getElementById('folder-cards-grid');
+      grid.innerHTML = categories.map(cat => {
+        const catDocs = documents.filter(d => d.category === cat);
+        return `
+          <button onclick="setCategory('${cat}')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-sm transition-all text-left group cursor-pointer">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-9 h-9 rounded-lg bg-slate-100 group-hover:bg-blue-50 text-slate-600 group-hover:text-blue-600 flex items-center justify-center transition-colors">
+                <i data-lucide="folder" class="w-4 h-4"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-400 group-hover:text-blue-600">${catDocs.length} arq.</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-800 truncate">${cat}</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">${catDocs.length === 1 ? '1 documento' : `${catDocs.length} documentos`}</p>
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Generate Table Row HTML
+    function createRowHTML(doc, includeAuthor = true) {
+      const badge = getTypeBadge(doc.type);
+      return `
+        <tr class="hover:bg-slate-50/90 transition-colors group">
+          <td class="py-3.5 px-6">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg ${badge.bg} ${badge.text} border ${badge.border} flex items-center justify-center shrink-0">
+                <i data-lucide="${badge.icon}" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <button onclick="openPreviewModal('${doc.id}')" class="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block text-left cursor-pointer">
+                  ${doc.name}
+                </button>
+                ${doc.isRecent ? '<span class="inline-block text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded mt-0.5">Recente</span>' : ''}
+              </div>
+            </div>
+          </td>
+          <td class="py-3.5 px-4">
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
+              ${doc.category}
+            </span>
+          </td>
+          <td class="py-3.5 px-4">
+            <span class="text-xs font-semibold ${badge.text} ${badge.bg} border ${badge.border} px-2 py-0.5 rounded">
+              ${doc.type}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-xs text-slate-500 whitespace-nowrap">${formatDate(doc.date)}</td>
+          ${includeAuthor ? `<td class="py-3.5 px-4 text-xs text-slate-600 whitespace-nowrap">${doc.author}</td>` : ''}
+          <td class="py-3.5 px-6 text-right whitespace-nowrap">
+            <div class="inline-flex items-center justify-end gap-1">
+              <button onclick="openPreviewModal('${doc.id}')" title="Visualizar" class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+              <button onclick="downloadFile('${doc.id}')" title="Baixar" class="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer">
+                <i data-lucide="download" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteFile('${doc.id}')" title="Excluir" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    // Render Dashboard Recent Table
+    function renderRecentTable() {
+      const tbody = document.getElementById('recent-files-tbody');
+      const sorted = [...documents].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+      tbody.innerHTML = sorted.map(doc => createRowHTML(doc, false)).join('');
+    }
+
+    // Render Full File Manager Table with Filters
+    function renderFilesTable() {
+      const tbody = document.getElementById('all-files-tbody');
+      const emptyState = document.getElementById('empty-state');
+      const resultsLabel = document.getElementById('table-results-label');
+      const resetBtn = document.getElementById('reset-filters-btn');
+
+      const filtered = documents.filter(doc => {
+        const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              doc.author.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
+        const matchesType = selectedType === 'all' || doc.type === selectedType;
+        return matchesSearch && matchesCategory && matchesType;
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      resultsLabel.textContent = `Exibindo ${filtered.length} ${filtered.length === 1 ? 'documento' : 'documentos'}`;
+
+      if (searchQuery || selectedCategory !== 'all' || selectedType !== 'all') {
+        resetBtn.classList.remove('hidden');
+      } else {
+        resetBtn.classList.add('hidden');
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        tbody.innerHTML = filtered.map(doc => createRowHTML(doc, true)).join('');
+      }
+    }
+
+    // Navigation & View Switching
+    function setView(view) {
+      currentView = view;
+      const dashSection = document.getElementById('dashboard-section');
+      const filesSection = document.getElementById('files-section');
+      const pageTitle = document.getElementById('page-title');
+
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('bg-slate-800/80', 'text-white');
+        el.classList.add('text-slate-400');
+      });
+
+      if (view === 'dashboard') {
+        dashSection.classList.remove('hidden');
+        filesSection.classList.add('hidden');
+        pageTitle.textContent = 'Visão Geral';
+        const navDash = document.getElementById('nav-dashboard');
+        navDash.classList.add('bg-slate-800/80', 'text-white');
+        navDash.classList.remove('text-slate-400');
+      } else {
+        dashSection.classList.add('hidden');
+        filesSection.classList.remove('hidden');
+        if (selectedCategory === 'all') {
+          pageTitle.textContent = 'Todos os Arquivos';
+          const navAll = document.getElementById('nav-all');
+          navAll.classList.add('bg-slate-800/80', 'text-white');
+          navAll.classList.remove('text-slate-400');
+        } else {
+          pageTitle.textContent = `Pasta: ${selectedCategory}`;
+          const navCat = document.getElementById(`nav-cat-${selectedCategory}`);
+          if (navCat) {
+            navCat.classList.add('bg-slate-800/80', 'text-white');
+            navCat.classList.remove('text-slate-400');
+          }
+        }
+        renderFilesTable();
+      }
+
+      // Close mobile sidebar if open
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+        toggleSidebar();
+      }
+      lucide.createIcons();
+    }
+
+    function setCategory(category) {
+      selectedCategory = category;
+      document.getElementById('filter-category').value = category;
+      setView('all');
+    }
+
+    function syncSearch(val) {
+      searchQuery = val;
+      document.getElementById('header-search').value = val;
+      document.getElementById('manager-search').value = val;
+      if (currentView === 'dashboard' && val.trim() !== '') {
+        setView('all');
+      } else {
+        renderFilesTable();
+        lucide.createIcons();
+      }
+    }
+
+    function applyFilters() {
+      selectedCategory = document.getElementById('filter-category').value;
+      selectedType = document.getElementById('filter-type').value;
+      const pageTitle = document.getElementById('page-title');
+      pageTitle.textContent = selectedCategory === 'all' ? 'Todos os Arquivos' : `Pasta: ${selectedCategory}`;
+      renderFilesTable();
+      lucide.createIcons();
+    }
+
+    function resetFilters() {
+      searchQuery = '';
+      selectedCategory = 'all';
+      selectedType = 'all';
+      document.getElementById('header-search').value = '';
+      document.getElementById('manager-search').value = '';
+      document.getElementById('filter-category').value = 'all';
+      document.getElementById('filter-type').value = 'all';
+      setView('all');
+    }
+
+    // Mobile Sidebar Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    }
+
+    // Upload Modal Handlers
+    function openUploadModal() {
+      document.getElementById('upload-form').reset();
+      if (selectedCategory !== 'all') {
+        document.getElementById('input-doc-category').value = selectedCategory;
+      }
+      const modal = document.getElementById('upload-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeUploadModal() {
+      const modal = document.getElementById('upload-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleRealFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('input-doc-name').value = file.name;
+      const ext = file.name.split('.').pop().toUpperCase();
+      if (['PDF'].includes(ext)) document.getElementById('input-doc-type').value = 'PDF';
+      else if (['XLS', 'XLSX', 'CSV'].includes(ext)) document.getElementById('input-doc-type').value = 'XLSX';
+      else if (['DOC', 'DOCX', 'TXT'].includes(ext)) document.getElementById('input-doc-type').value = 'DOCX';
+      else if (['PNG', 'JPG', 'JPEG', 'WEBP'].includes(ext)) document.getElementById('input-doc-type').value = 'IMG';
+    }
+
+    function handleAddFile(e) {
+      e.preventDefault();
+      const name = document.getElementById('input-doc-name').value.trim();
+      const category = document.getElementById('input-doc-category').value;
+      const type = document.getElementById('input-doc-type').value;
+      const desc = document.getElementById('input-doc-desc').value.trim() || 'Documento corporativo adicionado ao repositório.';
+
+      const today = new Date().toISOString().split('T')[0];
+
+      const newDoc = {
+        id: 'doc-' + Date.now(),
+        name,
+        category,
+        type,
+        date: today,
+        isRecent: true,
+        author: 'Camila Mendes',
+        description: desc
+      };
+
+      documents.unshift(newDoc);
+      saveState();
+      closeUploadModal();
+      refreshAll();
+      showToast(`"${name}" adicionado em ${category}.`);
+    }
+
+    // Preview Modal
+    function openPreviewModal(id) {
+      const doc = documents.find(d => d.id === id);
+      if (!doc) return;
+
+      document.getElementById('preview-title').textContent = doc.name;
+      document.getElementById('preview-filename-display').textContent = doc.name;
+      document.getElementById('preview-desc-display').textContent = doc.description;
+      document.getElementById('preview-category').textContent = doc.category;
+      document.getElementById('preview-type').textContent = doc.type;
+      document.getElementById('preview-date').textContent = formatDate(doc.date);
+      document.getElementById('preview-author').textContent = doc.author;
+
+      document.getElementById('preview-download-btn').onclick = () => downloadFile(doc.id);
+
+      const modal = document.getElementById('preview-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closePreviewModal() {
+      const modal = document.getElementById('preview-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Simulated Download
+    function downloadFile(id) {
+      const doc = documents.find(d => d.id === id);
+      if (!doc) return;
+      const content = `NEXDOC CORPORATIVO - METADADOS DO ARQUIVO\n----------------------------------------\nArquivo: ${doc.name}\nCategoria: ${doc.category}\nTipo: ${doc.type}\nData: ${formatDate(doc.date)}\nResponsável: ${doc.author}\nDescrição: ${doc.description}`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Download iniciado: ${doc.name}`);
+    }
+
+    // Delete File
+    function deleteFile(id) {
+      const doc = documents.find(d => d.id === id);
+      if (!doc) return;
+      if (confirm(`Deseja realmente excluir o documento "${doc.name}"?`)) {
+        documents = documents.filter(d => d.id !== id);
+        saveState();
+        refreshAll();
+        showToast('Documento removido do sistema.');
+      }
+    }
+
+    // Toast Feedback
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // Refresh Entire UI
+    function refreshAll() {
+      updateMetrics();
+      renderFolderCards();
+      renderRecentTable();
+      renderFilesTable();
+      lucide.createIcons();
+    }
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshAll();
+    });
+  </script>
+</body>
+</html>
